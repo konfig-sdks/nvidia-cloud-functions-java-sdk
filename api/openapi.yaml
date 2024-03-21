@@ -1,0 +1,4409 @@
+openapi: 3.0.1
+info:
+  contact:
+    name: NVIDIA
+    url: https://www.nvidia.com/
+  description: "Since its founding in 1993, NVIDIA (NASDAQ: NVDA) has been a pioneer\
+    \ in accelerated computing. The company's invention of the GPU in 1999 sparked\
+    \ the growth of the PC gaming market, redefined computer graphics, ignited the\
+    \ era of modern AI and is fueling the creation of the metaverse. NVIDIA is now\
+    \ a full-stack computing company with data-center-scale offerings that are reshaping\
+    \ industry."
+  termsOfService: https://www.nvidia.com/en-us/legal_info
+  title: Cloud Functions
+  version: 2.87.3
+  x-konfig-ignore:
+    object-with-no-properties: true
+servers:
+- description: Generated server url
+  url: https://api.nvcf.nvidia.com
+tags:
+- description: Defines endpoints related to associating authorized accounts with a
+    function for  Account Admins. All the endpoints defined in this API require a
+    bearer token with  'authorize_clients' scope in HTTP Authorization header.
+  name: Authorized Accounts
+- description: 'Defines Function Management endpoints for Account Admins. All tne
+    endpoints  defined in this API require a bearer token or an api-key with appropriate
+    scope in  the HTTP Authorization header. '
+  name: Function Management
+- description: Defines Asset Management endpoints for Account Admins/Users. All the
+    endpoints  defined in this API require a bearer token in the HTTP Authorization
+    header with  'invoke_function' scope.
+  name: Asset Management
+- description: Defines Function Deployment endpoints for Account Admins. All tne endpoints
+    defined  in this API require a bearer token with 'deploy_function' scope in the
+    HTTP  Authorization header.
+  name: Function Deployment
+- description: 'Defines function pass-through invocation endpoints where the invocation
+    payload  is passed as-is without any wrapper. All tne endpoints defined in this
+    API  require either a bearer token or an api-key with ''invoke_function'' scope
+    in the  HTTP Authorization header. '
+  name: Function Invocation
+- description: 'Defines endpoints that use an envelope to wrap the invocation payload
+    for  Account Admins/Users. All the endpoints defined in this API require either
+    a  bearer token or an api-key in the HTTP Authorization header with ''invoke_function''  scope.
+    These endpoints have been deprecated. Please use pass-through function  invocation
+    endpoints. '
+  name: Envelope Function Invocation
+- description: 'Defines Queue Details endpoints for Account Admins/Users. All tne
+    endpoints  defined in this API require either a bearer token or an api-key with  ''queue_details''
+    scope in the HTTP Authorization header. '
+  name: Queue Details
+- description: Defines endpoints to list Cluster Groups and GPUs for Account Admins.
+    All tne  endpoints defined in this API require a bearer token with 'list_cluster_groups'  scope
+    in the HTTP Authorization header.
+  name: Cluster Groups and GPUs
+- name: Health
+paths:
+  /v2/nvcf/deployments/functions/{functionId}/versions/{functionVersionId}:
+    delete:
+      description: "Deletes the deployment associated with the specified function.\
+        \ Upon  deletion, any active instances will be terminated, and the function's\
+        \ status  will transition to 'INACTIVE'. To undeploy a function version gracefully,\
+        \  specify 'graceful=true' query parameter, allowing current tasks to complete\
+        \  before terminating the instances. If the specified function version is\
+        \ public,  then Account Admin cannot perform this operation. Access to this\
+        \ endpoint mandates a bearer token with 'deploy_function' scope in the  HTTP\
+        \ Authorization header. "
+      operationId: FunctionDeployment_deleteByIdAndVersion
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version id
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Query param to deactivate function for graceful shutdown
+        explode: true
+        in: query
+        name: graceful
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--v2-nvcf-deployments-functions-functionId-versions-functionVersionId-delete-parameters-2-schema
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionResponse'
+          description: OK
+      summary: Delete Function Deployment
+      tags:
+      - Function Deployment
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-deployments-functions-functionId-versions-functionVersionId
+      x-accepts: application/json
+    get:
+      description: 'Allows Account Admins to retrieve the deployment details of the
+        specified  function version. Access to this endpoint mandates a bearer token
+        with ''deploy_function'' scope in the  HTTP Authorization header. '
+      operationId: FunctionDeployment_details
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version id
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeploymentResponse'
+          description: OK
+      summary: Get Function Deployment Details
+      tags:
+      - Function Deployment
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-deployments-functions-functionId-versions-functionVersionId
+      x-accepts: application/json
+    post:
+      description: "Initiates deployment for the specified function version. Upon\
+        \ invocation of  this endpoint, the function's status transitions to 'DEPLOYING'.\
+        \ If the  specified function version is public, then Account Admin cannot\
+        \ perform this  operation. Access to this endpoint mandates a bearer token\
+        \ with 'deploy_function' scope in the  HTTP Authorization header. "
+      operationId: FunctionDeployment_initiateDeploymentForVersion
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version id
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FunctionDeploymentRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeploymentResponse'
+          description: OK
+      summary: Deploy Function
+      tags:
+      - Function Deployment
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-deployments-functions-functionId-versions-functionVersionId
+      x-content-type: application/json
+      x-accepts: application/json
+    put:
+      description: "Updates the deployment specs of the specified function version.\
+        \ It's important  to note that GPU type and backend configurations cannot\
+        \ be modified through  this endpoint. If the specified function is public,\
+        \ then Account Admin cannot  perform this operation. Access to this endpoint\
+        \ mandates a bearer token with 'deploy_function' scope in the  HTTP Authorization\
+        \ header. "
+      operationId: FunctionDeployment_updateSpecs
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version id
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FunctionDeploymentRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeploymentResponse'
+          description: OK
+      summary: Update Function Deployment
+      tags:
+      - Function Deployment
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-put--v2-nvcf-deployments-functions-functionId-versions-functionVersionId
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/pexec/functions/{functionId}:
+    post:
+      description: "Invokes the specified function that was successfully deployed.\
+        \ If the version  is not specified, any active function versions will handle\
+        \ the request. If  the version is specified in the URI, then the request is\
+        \ exclusively processed  by the designated version of the function. By default,\
+        \ this endpoint will block  for 5 seconds. If the request is not fulfilled\
+        \ before the timeout, it's status  is considered in-progress or pending and\
+        \ the response includes HTTP status code  202 with an invocation request ID,\
+        \ indicating that the client should commence  polling for the result using\
+        \ the invocation request ID. Access to this endpoint  mandates inclusion of\
+        \ either a bearer token or an api-key with 'invoke_function'  scope in the\
+        \ HTTP Authorization header. Additionally, this endpoint has the  capability\
+        \ to provide updates on the progress of the request, contingent  upon the\
+        \ workload's provision of such information. In-progress responses are returned\
+        \ in order. If no in-progress response is received  during polling you will\
+        \ receive the most recent in-progress response. Only the first  256 unread\
+        \ in-progress messages are kept. "
+      operationId: FunctionInvocation_invokeFunction
+      parameters:
+      - explode: false
+        in: header
+        name: NVCF-INPUT-ASSET-REFERENCES
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: simple
+      - explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: header
+        name: NVCF-POLL-SECONDS
+        required: false
+        schema:
+          format: int32
+          maximum: 300
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FunctionInvocationInvokeFunctionRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction200Response'
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunctionResponse'
+          description: Invocation is fulfilled
+          headers:
+            NVCF-REQID:
+              description: Invocation Request Id
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction202Response'
+          description: Result is pending. Client should poll using the requestId.
+          headers:
+            NVCF-REQID:
+              description: Invocation Request Id
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "302":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction302Response'
+          description: 'Client should use the URL specified in the ''Location'' response
+            header to fetch  large result. '
+          headers:
+            NVCF-REQID:
+              description: Invocation Request Id
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Location:
+              description: URL to get the result
+              explode: false
+              schema:
+                type: string
+              style: simple
+          x-do-not-generate: true
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction402Response'
+          description: Cloud credits expired for public functions. Please contact
+            NVIDIA representatives.
+          x-do-not-generate: true
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction403Response'
+          description: 'Either missing scope in the auth(SSA JWT / SAK) token and/or
+            missing resource entry  in the SAK for the function. '
+          x-do-not-generate: true
+      summary: Call Function
+      tags:
+      - Function Invocation
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-pexec-functions-functionId
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/pexec/functions/{functionId}/versions/{versionId}:
+    post:
+      description: "Invokes the specified function that was successfully deployed.\
+        \ If the version  is not specified, any active function versions will handle\
+        \ the request. If  the version is specified in the URI, then the request is\
+        \ exclusively processed  by the designated version of the function. By default,\
+        \ this endpoint will block  for 5 seconds. If the request is not fulfilled\
+        \ before the timeout, it's status  is considered in-progress or pending and\
+        \ the response includes HTTP status code  202 with an invocation request ID,\
+        \ indicating that the client should commence  polling for the result using\
+        \ the invocation request ID. Access to this endpoint  mandates inclusion of\
+        \ either a bearer token or an api-key with 'invoke_function'  scope in the\
+        \ HTTP Authorization header. Additionally, this endpoint has the  capability\
+        \ to provide updates on the progress of the request, contingent  upon the\
+        \ workload's provision of such information. In-progress responses are returned\
+        \ in order. If no in-progress response is received  during polling you will\
+        \ receive the most recent in-progress response. Only the first  256 unread\
+        \ in-progress messages are kept. "
+      operationId: FunctionInvocation_invokeFunction
+      parameters:
+      - explode: false
+        in: header
+        name: NVCF-INPUT-ASSET-REFERENCES
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: simple
+      - explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: versionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: header
+        name: NVCF-POLL-SECONDS
+        required: false
+        schema:
+          format: int32
+          maximum: 300
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FunctionInvocationInvokeFunctionRequest1'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction200Response'
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction200Response1'
+          description: Invocation is fulfilled
+          headers:
+            NVCF-REQID:
+              description: Invocation Request Id
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction202Response'
+          description: Result is pending. Client should poll using the requestId.
+          headers:
+            NVCF-REQID:
+              description: Invocation Request Id
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "302":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction302Response'
+          description: 'Client should use the URL specified in the ''Location'' response
+            header to fetch  large result. '
+          headers:
+            NVCF-REQID:
+              description: Invocation Request Id
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Location:
+              description: URL to get the result
+              explode: false
+              schema:
+                type: string
+              style: simple
+          x-do-not-generate: true
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction402Response'
+          description: Cloud credits expired for public functions. Please contact
+            NVIDIA representatives.
+          x-do-not-generate: true
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationInvokeFunction403Response'
+          description: 'Either missing scope in the auth(SSA JWT / SAK) token and/or
+            missing resource entry  in the SAK for the function. '
+          x-do-not-generate: true
+      summary: Call Function
+      tags:
+      - Function Invocation
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-pexec-functions-functionId-versions-versionId
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/exec/functions/{functionId}:
+    post:
+      deprecated: true
+      description: "Invokes the specified function that was successfully deployed.\
+        \ If the version  is not specified, any active function versions will handle\
+        \ the request. If  the version is specified in the URI, then the request is\
+        \ exclusively processed  by the designated version of the function. By default,\
+        \ this endpoint will block  for 5 seconds. If the request is not fulfilled\
+        \ before the timeout, it's status  is considered in-progress or pending and\
+        \ the response includes HTTP status code  202 with an invocation request ID,\
+        \ indicating that the client should commence  polling for the result using\
+        \ the invocation request ID. Access to this endpoint  mandates inclusion of\
+        \ either a bearer token or an api-key with 'invoke_function'  scope in the\
+        \ HTTP Authorization header. Additionally, this endpoint has the  capability\
+        \ to provide updates on the progress of the request, contingent  upon the\
+        \ workload's provision of such information. In-progress responses are returned\
+        \ in order. If no in-progress response is received  during polling you will\
+        \ receive the most recent in-progress response. Only the first  256 unread\
+        \ in-progress messages are kept. "
+      operationId: EnvelopeFunctionInvocation_callFunction
+      parameters:
+      - explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeFunctionRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: Invocation is fulfilled
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: Result is pending. Client should poll using the requestId.
+        "302":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: 'Client should use the URL specified in the ''Location'' response
+            header to fetch  large result. '
+          headers:
+            Location:
+              explode: false
+              schema:
+                type: string
+              style: simple
+          x-do-not-generate: true
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: Cloud credits expired for public functions. Please contact
+            NVIDIA representatives.
+          x-do-not-generate: true
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: 'Either missing scope in the auth(SSA JWT / SAK) token and/or
+            missing resource entry  in the SAK for the function. '
+          x-do-not-generate: true
+      summary: Call Function
+      tags:
+      - Envelope Function Invocation
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-exec-functions-functionId
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/exec/functions/{functionId}/versions/{versionId}:
+    post:
+      deprecated: true
+      description: "Invokes the specified function that was successfully deployed.\
+        \ If the version  is not specified, any active function versions will handle\
+        \ the request. If  the version is specified in the URI, then the request is\
+        \ exclusively processed  by the designated version of the function. By default,\
+        \ this endpoint will block  for 5 seconds. If the request is not fulfilled\
+        \ before the timeout, it's status  is considered in-progress or pending and\
+        \ the response includes HTTP status code  202 with an invocation request ID,\
+        \ indicating that the client should commence  polling for the result using\
+        \ the invocation request ID. Access to this endpoint  mandates inclusion of\
+        \ either a bearer token or an api-key with 'invoke_function'  scope in the\
+        \ HTTP Authorization header. Additionally, this endpoint has the  capability\
+        \ to provide updates on the progress of the request, contingent  upon the\
+        \ workload's provision of such information. In-progress responses are returned\
+        \ in order. If no in-progress response is received  during polling you will\
+        \ receive the most recent in-progress response. Only the first  256 unread\
+        \ in-progress messages are kept. "
+      operationId: EnvelopeFunctionInvocation_invokeFunction
+      parameters:
+      - explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: versionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeFunctionRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: Invocation is fulfilled
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: Result is pending. Client should poll using the requestId.
+        "302":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: 'Client should use the URL specified in the ''Location'' response
+            header to fetch  large result. '
+          headers:
+            Location:
+              explode: false
+              schema:
+                type: string
+              style: simple
+          x-do-not-generate: true
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: Cloud credits expired for public functions. Please contact
+            NVIDIA representatives.
+          x-do-not-generate: true
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: 'Either missing scope in the auth(SSA JWT / SAK) token and/or
+            missing resource entry  in the SAK for the function. '
+          x-do-not-generate: true
+      summary: Call Function
+      tags:
+      - Envelope Function Invocation
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-exec-functions-functionId-versions-versionId
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/functions/{functionId}/versions:
+    get:
+      description: 'Lists details of all the versions of the specified function in
+        the authenticated  NVIDIA Cloud Account. Requires either a bearer token or
+        an api-key with  ''list_functions'' or ''list_functions_details'' scopes in
+        the HTTP Authorization  header. '
+      operationId: FunctionManagement_listFunctionVersions
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFunctionsResponse'
+          description: OK
+      summary: List Function Versions
+      tags:
+      - Function Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-functions-functionId-versions
+      x-accepts: application/json
+    post:
+      description: 'Creates a version of the specified function within the authenticated
+        NVIDIA  Cloud Account. Requires a bearer token with ''register_function''
+        scope in the  HTTP Authorization header. '
+      operationId: FunctionManagement_createFunctionVersion
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFunctionRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFunctionResponse'
+          description: OK
+      summary: Create Function Version
+      tags:
+      - Function Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-functions-functionId-versions
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/functions:
+    get:
+      description: Lists all the functions associated with the authenticated NVIDIA
+        Cloud Account.  Requires either a bearer token or an api-key with 'list_functions'
+        or  'list_functions_details' scopes in the HTTP Authorization header.
+      operationId: FunctionManagement_listFunctions
+      parameters:
+      - description: 'Query param ''visibility'' indicates the kind of functions to
+          be included  in the response. '
+        explode: true
+        in: query
+        name: visibility
+        required: false
+        schema:
+          default:
+          - authorized
+          - private
+          - public
+          example:
+          - authorized
+          - private
+          - public
+          items:
+            enum:
+            - authorized
+            - private
+            - public
+            type: string
+          type: array
+          uniqueItems: true
+          x-konfig-original-example:
+          - authorized
+          - private
+          - public
+          x-konfig-generated-schema: konfig-generated-schema-paths--v2-nvcf-functions-get-parameters-0-schema
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFunctionsResponse'
+          description: OK
+      summary: List Functions
+      tags:
+      - Function Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-functions
+      x-accepts: application/json
+    post:
+      description: 'Creates a new function within the authenticated NVIDIA Cloud Account.
+        Requires a  bearer token with ''register_function'' scope in the HTTP Authorization
+        header. '
+      operationId: FunctionManagement_registerNewFunction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFunctionRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateFunctionResponse'
+          description: OK
+      summary: Create Function
+      tags:
+      - Function Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-functions
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/authorizations/functions/{functionId}/versions/{functionVersionId}:
+    delete:
+      description: "Deletes all the authorized accounts that are directly associated\
+        \ with the  specified function version. Authorized parties that are inherited\
+        \ by the  function version are not deleted. If the specified function version\
+        \ is public,  then Account Admin cannot perform this operation. Access to\
+        \ this functionality mandates the inclusion of a bearer token with the  'authorize_clients'\
+        \ scope in the HTTP Authorization header "
+      operationId: AuthorizedAccounts_deleteExtraForFunctionVersion
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedPartiesResponse'
+          description: OK
+      summary: Delete All Extra Authorizations For Function Version
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId
+      x-accepts: application/json
+    get:
+      description: 'Gets NVIDIA Cloud Account IDs that are authorized to invoke specified
+        function  version. Response includes authorized accounts that were added specifically  to
+        the function version and the inherited authorized accounts that were  added
+        at the function level. Access to this functionality mandates the inclusion
+        of a bearer token with the  ''authorize_clients'' scope in the HTTP Authorization
+        header '
+      operationId: AuthorizedAccounts_functionVersionAuthorizations
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedPartiesResponse'
+          description: OK
+      summary: Get Account Authorizations For Function Version
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId
+      x-accepts: application/json
+    post:
+      description: "Authorizes additional NVIDIA Cloud Accounts to invoke a specific\
+        \ function  version. By default, a function belongs to the NVIDIA Cloud Account\
+        \ that  created it, and the credentials used for function invocation must\
+        \ reference  the same NVIDIA Cloud Account. Upon invocation of this endpoint,\
+        \ any existing  authorized accounts will be overwritten by the newly specified\
+        \ authorized  accounts. Access to this functionality mandates the inclusion\
+        \ of a bearer token with the  'authorize_clients' scope in the HTTP Authorization\
+        \ header "
+      operationId: AuthorizedAccounts_authorizeFunctionAccounts
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version id
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizedPartiesRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedPartiesResponse'
+          description: OK
+      summary: Authorize Accounts To Invoke Function Version
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/authorizations/functions/{functionId}:
+    delete:
+      description: "Deletes all the extra NVIDIA Cloud Accounts that were authorized\
+        \ to invoke the  function and all its versions. If a function version has\
+        \ its own set of  authorized accounts, those are not deleted. If the specified\
+        \ function is  public, then Account Admin cannot perform this operation. Access\
+        \ to this functionality mandates the inclusion of a bearer token with the\
+        \  'authorize_clients' scope in the HTTP Authorization header "
+      operationId: AuthorizedAccounts_deleteAllExtraForFunction
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedPartiesResponse'
+          description: OK
+      summary: Delete All Extra Authorizations For Function
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-authorizations-functions-functionId
+      x-accepts: application/json
+    get:
+      description: "Lists NVIDIA Cloud Account IDs that are authorized to invoke any\
+        \ version of the  specified function. The response includes an array showing\
+        \ authorized accounts  for each version. Individual versions of a function\
+        \ can have their own  authorized accounts. So, each object in the array can\
+        \ have different  authorized accounts listed. Access to this functionality\
+        \ mandates the inclusion of a bearer token with the  'authorize_clients' scope\
+        \ in the HTTP Authorization header "
+      operationId: AuthorizedAccounts_listForFunction
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAuthorizedPartiesResponse'
+          description: OK
+      summary: List Account Authorizations For Function
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-authorizations-functions-functionId
+      x-accepts: application/json
+    post:
+      description: "Authorizes additional NVIDIA Cloud Accounts to invoke any version\
+        \ of the  specified function. By default, a function belongs to the NVIDIA\
+        \ Cloud Account  that created it, and the credentials used for function invocation\
+        \ must  reference the same NVIDIA Cloud Account. Upon invocation of this endpoint,\
+        \ any  existing authorized accounts will be overwritten by the newly specified\
+        \  authorized accounts. Access to this functionality mandates the inclusion\
+        \ of a bearer token with the  'authorize_clients' scope in the HTTP Authorization\
+        \ header "
+      operationId: AuthorizedAccounts_authorizeFunctionAccounts
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizedPartiesRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedPartiesResponse'
+          description: OK
+      summary: Authorize Accounts To Invoke Function
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-authorizations-functions-functionId
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/assets:
+    get:
+      description: 'List assets owned by the current NVIDIA Cloud Account. Requires
+        either a  bearer token or an api-key with invoke_function scope in the HTTP
+        Authorization  header. '
+      operationId: AssetManagement_listAssets
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAssetsResponse'
+          description: OK
+      summary: List Assets
+      tags:
+      - Asset Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-assets
+      x-accepts: application/json
+    post:
+      description: Creates a unique id representing an asset and a pre-signed URL
+        to upload the  asset artifact to AWS S3 bucket for the NVIDIA Cloud Account.
+        Requires either  a bearer token or an api-key with 'invoke_function' scope
+        in the HTTP  Authorization header.
+      operationId: AssetManagement_createAssetAndUrl
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAssetResponse'
+          description: OK
+      summary: Create Asset
+      tags:
+      - Asset Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--v2-nvcf-assets
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/authorizations/functions/{functionId}/versions/{functionVersionId}/remove:
+    patch:
+      description: "Removes the specified NVIDIA Cloud Account from the set of authorized\
+        \ accounts  that are directly associated with specified function version.\
+        \ If the specified  function version does not have any of its own(not inherited)\
+        \ authorized  accounts, it results in a response with status 404. Also, if\
+        \ the specified  authorized account is not in the set of existing authorized\
+        \ parties that are  directly associated with the specified function version,\
+        \ it results in a  response with status code 400. If the specified function\
+        \ version is public,  then Account Admin cannot perform this operation. Access\
+        \ to this functionality mandates the inclusion of a bearer token with the\
+        \  'authorize_clients' scope in the HTTP Authorization header "
+      operationId: AuthorizedAccounts_removePartyForVersion
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchAuthorizedPartyRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedPartiesResponse'
+          description: OK
+      summary: Unauthorize Account From Invoking Function Version
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-patch--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId-remove
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/authorizations/functions/{functionId}/versions/{functionVersionId}/add:
+    patch:
+      description: "Adds the specified NVIDIA Cloud Account to the set of authorized\
+        \ accounts that  can invoke the specified function version. If the specified\
+        \ function version  does not have any existing inheritable authorized accounts,\
+        \ it results in a  response with status 404. If the specified account is already\
+        \ in the set of  existing authorized accounts that are directly associated\
+        \ with the function  version, it results in a response wit status code 409.\
+        \ If a function is public,  then Account Admin cannot perform this operation.\
+        \ Access to this functionality mandates the inclusion of a bearer token with\
+        \ the  'authorize_clients' scope in the HTTP Authorization header "
+      operationId: AuthorizedAccounts_addAccountToFunctionVersion
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchAuthorizedPartyRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedPartiesResponse'
+          description: OK
+      summary: Authorize Additional Account To Invoke Function Version
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-patch--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId-add
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/authorizations/functions/{functionId}/remove:
+    patch:
+      description: "Removes the specified NVIDIA Cloud Account from the set of authorized\
+        \ accounts  that can invoke all the versions of the specified function. If\
+        \ the specified  function does not have any existing inheritable authorized\
+        \ parties, it results  in a response with status 404. Also, if the specified\
+        \ account is not in the  existing set of inheritable authorized accounts,\
+        \ it results in a response with  status 400. If the specified function is\
+        \ public, then Account Admin cannot  perform this operation. Access to this\
+        \ functionality mandates the inclusion of a bearer token with the  'authorize_clients'\
+        \ scope in the HTTP Authorization header "
+      operationId: AuthorizedAccounts_removeFromFunctionAuthorization
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchAuthorizedPartyRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedPartiesResponse'
+          description: OK
+      summary: Unauthorize Account From Invoking Function
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-patch--v2-nvcf-authorizations-functions-functionId-remove
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/authorizations/functions/{functionId}/add:
+    patch:
+      description: "Adds the specified NVIDIA Cloud Account to the set of authorized\
+        \ accounts that  are can invoke all the versions of the specified function.\
+        \ If the specified  function does not have any existing inheritable authorized\
+        \ accounts, it results  in a response with status 404. If the specified account\
+        \ is already in the set  of existing inheritable authorized accounts, it results\
+        \ in a response with  status code 409. If a function is public, then Account\
+        \ Admin cannot perform  this operation. Access to this functionality mandates\
+        \ the inclusion of a bearer token with the  'authorize_clients' scope in the\
+        \ HTTP Authorization header "
+      operationId: AuthorizedAccounts_addAccountToFunction
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchAuthorizedPartyRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizedPartiesResponse'
+          description: OK
+      summary: Authorize Additional Account To Invoke Function
+      tags:
+      - Authorized Accounts
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-patch--v2-nvcf-authorizations-functions-functionId-add
+      x-content-type: application/json
+      x-accepts: application/json
+  /v2/nvcf/queues/functions/{functionId}/versions/{versionId}:
+    get:
+      description: "Provides details of all the queues associated with the specified\
+        \ function.  If a function has multiple versions and they are all deployed,\
+        \ then the  response includes details of all the queues. If the specified\
+        \ function  is public, then Account Admin cannot perform this operation. Requires\
+        \ a bearer token or an api-key with 'queue_details' scope in the HTTP  Authorization\
+        \ header. "
+      operationId: QueueDetails_getAllQueuesDetails
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Function version id
+        explode: false
+        in: path
+        name: versionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetQueuesResponse'
+          description: OK
+      summary: Queue Details
+      tags:
+      - Queue Details
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-queues-functions-functionId-versions-versionId
+      x-accepts: application/json
+  /v2/nvcf/queues/functions/{functionId}:
+    get:
+      description: "Provides details of all the queues associated with the specified\
+        \ function.  If a function has multiple versions and they are all deployed,\
+        \ then the  response includes details of all the queues. If the specified\
+        \ function  is public, then Account Admin cannot perform this operation. Requires\
+        \ a bearer token or an api-key with 'queue_details' scope in the HTTP  Authorization\
+        \ header. "
+      operationId: QueueDetails_functionQueuesDetails
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetQueuesResponse'
+          description: OK
+      summary: Queue Details
+      tags:
+      - Queue Details
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-queues-functions-functionId
+      x-accepts: application/json
+  /v2/nvcf/queues/{requestId}/position:
+    get:
+      description: "Using the specified function invocation request id, returns the\
+        \ estimated  position of the corresponding message up to 1000 in the queue.\
+        \ Requires a bearer token or an api-key with 'queue_details' scope in the\
+        \ HTTP  Authorization header. "
+      operationId: QueueDetails_getQueuePositionByRequestId
+      parameters:
+      - description: Function invocation request id
+        explode: false
+        in: path
+        name: requestId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPositionInQueueResponse'
+          description: OK
+      summary: Queue Position
+      tags:
+      - Queue Details
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-queues-requestId-position
+      x-accepts: application/json
+  /v2/nvcf/pexec/status/{requestId}:
+    get:
+      description: "Retrieves the status of an in-progress or pending request using\
+        \ its unique  invocation request ID. If the result is available, it will be\
+        \ included in  the response, marking the request as fulfilled. Conversely,\
+        \ if the result is  not yet available, the request is deemed pending. Access\
+        \ to this endpoint  mandates inclusion of either a bearer token or an api-key\
+        \ with  'invoke_function' scope in the HTTP Authorization header. In-progress\
+        \ responses are returned in order. If no in-progress response is received\
+        \  during polling you will receive the most recent in-progress response. Only\
+        \ the first  256 unread in-progress messages are kept. "
+      operationId: FunctionInvocation_pollForResultUsingFunctionInvocationRequest
+      parameters:
+      - description: Function invocation request id
+        explode: false
+        in: path
+        name: requestId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: header
+        name: NVCF-POLL-SECONDS
+        required: false
+        schema:
+          format: int32
+          maximum: 300
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationPollForResultUsingFunctionInvocationRequestResponse'
+          description: Invocation is fulfilled
+          headers:
+            NVCF-REQID:
+              description: Invocation Request Id
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationPollForResultUsingFunctionInvocationRequest202Response'
+          description: Result is pending. Client should poll using the requestId.
+          headers:
+            NVCF-REQID:
+              description: Invocation Request Id
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "302":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationPollForResultUsingFunctionInvocationRequest302Response'
+          description: 'Client should use the URL specified in the ''Location'' response
+            header to fetch  large result. '
+          headers:
+            NVCF-REQID:
+              description: Invocation Request Id
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-PERCENT-COMPLETE:
+              description: Percentage complete
+              explode: false
+              schema:
+                type: string
+              style: simple
+            NVCF-STATUS:
+              description: Invocation status
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Location:
+              description: URL to get the result
+              explode: false
+              schema:
+                type: string
+              style: simple
+          x-do-not-generate: true
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationPollForResultUsingFunctionInvocationRequest402Response'
+          description: Cloud credits expired for public functions. Please contact
+            NVIDIA representatives.
+          x-do-not-generate: true
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionInvocationPollForResultUsingFunctionInvocationRequest403Response'
+          description: 'Either missing scope in the auth(SSA JWT / SAK) token and/or
+            missing resource entry  in the SAK for the function. '
+          x-do-not-generate: true
+      summary: Poll For Result Using Function Invocation Request
+      tags:
+      - Function Invocation
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-pexec-status-requestId
+      x-accepts: application/json
+  /v2/nvcf/functions/{functionId}/versions/{functionVersionId}:
+    delete:
+      description: "Deletes the specified function version in the authenticated NVIDIA\
+        \ Cloud  Account. Requires a bearer token with 'delete_function' scope in\
+        \ the HTTP  Authorization header. If the function version is public, then\
+        \ Account Admin  cannot delete the function. "
+      operationId: FunctionManagement_deleteFunctionVersion
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: Version id
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: No Content
+      summary: Delete Function
+      tags:
+      - Function Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-functions-functionId-versions-functionVersionId
+      x-accepts: application/json
+    get:
+      description: 'Retrieves detailed information of the specified function version
+        in the  authenticated NVIDIA Cloud Account. Requires either a bearer token
+        or an  api-key with ''list_functions'' or ''list_functions_details'' scopes
+        in the HTTP  Authorization header. '
+      operationId: FunctionManagement_getVersionDetails
+      parameters:
+      - description: Function id
+        explode: false
+        in: path
+        name: functionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: 'Version id '
+        explode: false
+        in: path
+        name: functionVersionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionResponse'
+          description: OK
+      summary: Get Function Version Details
+      tags:
+      - Function Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-functions-functionId-versions-functionVersionId
+      x-accepts: application/json
+  /v2/nvcf/functions/ids:
+    get:
+      description: 'Lists ids of all the functions in the authenticated NVIDIA Cloud
+        Account.  Requires either a bearer token or an api-key with ''list_functions''
+        or  ''list_functions_details'' scopes in the HTTP Authorization header. '
+      operationId: FunctionManagement_listFunctionIds
+      parameters:
+      - description: 'Query param ''visibility'' indicates the kind of functions to
+          be included  in the response. '
+        explode: true
+        in: query
+        name: visibility
+        required: false
+        schema:
+          default:
+          - authorized
+          - private
+          - public
+          example:
+          - authorized
+          - private
+          - public
+          items:
+            enum:
+            - authorized
+            - private
+            - public
+            type: string
+          type: array
+          uniqueItems: true
+          x-konfig-original-example:
+          - authorized
+          - private
+          - public
+          x-konfig-generated-schema: konfig-generated-schema-paths--v2-nvcf-functions-ids-get-parameters-0-schema
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFunctionIdsResponse'
+          description: OK
+      summary: List Function Ids
+      tags:
+      - Function Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-functions-ids
+      x-accepts: application/json
+  /v2/nvcf/exec/status/{requestId}:
+    get:
+      deprecated: true
+      description: "Retrieves the status of an in-progress or pending request using\
+        \ its unique  invocation request ID. If the result is available, it will be\
+        \ included in  the response, marking the request as fulfilled. Conversely,\
+        \ if the result is  not yet available, the request is deemed pending. Access\
+        \ to this endpoint  mandates inclusion of either a bearer token or an api-key\
+        \ with  'invoke_function' scope in the HTTP Authorization header. In-progress\
+        \ responses are returned in order. If no in-progress response is received\
+        \  during polling you will receive the most recent in-progress response. Only\
+        \ the first  256 unread in-progress messages are kept. "
+      operationId: EnvelopeFunctionInvocation_pollForResultUsingFunctionInvocationRequest
+      parameters:
+      - description: Function invocation request id
+        explode: false
+        in: path
+        name: requestId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: Invocation is fulfilled
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: Result is pending. Client should poll using the requestId.
+        "302":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: 'Client should use the URL specified in the ''Location'' response
+            header to fetch  large result. '
+          headers:
+            Location:
+              explode: false
+              schema:
+                type: string
+              style: simple
+          x-do-not-generate: true
+        "402":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: Cloud credits expired for public functions. Please contact
+            NVIDIA representatives.
+          x-do-not-generate: true
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeFunctionResponse'
+          description: 'Either missing scope in the auth(SSA JWT / SAK) token and/or
+            missing resource entry  in the SAK for the function. '
+          x-do-not-generate: true
+      summary: Poll For Result Using Function Invocation Request
+      tags:
+      - Envelope Function Invocation
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-exec-status-requestId
+      x-accepts: application/json
+  /v2/nvcf/clusterGroups:
+    get:
+      description: "Lists Cluster Groups for the current account. The response includes\
+        \ cluster  groups defined specifically in the current account and publicly\
+        \ available  cluster groups such as GFN, OCI, etc. Requires a bearer token\
+        \ with 'list_cluster_groups' scope in HTTP Authorization header. "
+      operationId: ClusterGroupsAndGpUs_list
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterGroupsResponse'
+          description: OK
+      summary: List Cluster Groups
+      tags:
+      - Cluster Groups and GPUs
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-clusterGroups
+      x-accepts: application/json
+  /v2/nvcf/assets/{assetId}:
+    delete:
+      description: Deletes asset belonging to the current NVIDIA Cloud Account. Requires
+        either  a bearer token or an api-key with 'invoke_function' scope in the HTTP  Authorization
+        header.
+      operationId: AssetManagement_deleteAssetById
+      parameters:
+      - description: Id of the asset to be deleted
+        explode: false
+        in: path
+        name: assetId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: No Content
+      summary: Delete Asset
+      tags:
+      - Asset Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-assets-assetId
+      x-accepts: application/json
+    get:
+      description: 'Returns details for the specified asset-id belonging to the current
+        NVIDIA  Cloud Account. Requires either a bearer token or an api-key with  ''invoke_function''
+        scope in the HTTP Authorization header. '
+      operationId: AssetManagement_showDetails
+      parameters:
+      - description: Asset id
+        explode: false
+        in: path
+        name: assetId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetResponse'
+          description: OK
+      summary: Show Asset Details
+      tags:
+      - Asset Management
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--v2-nvcf-assets-assetId
+      x-accepts: application/json
+  /health/**:
+    get:
+      description: Get Health Information about this service
+      operationId: Health_getInfo
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthComponent'
+          description: OK
+      summary: Get Health Information
+      tags:
+      - Health
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--health-**
+      x-accepts: application/json
+components:
+  schemas:
+    FunctionDeploymentRequest:
+      description: Request to deploy a function
+      example:
+        deploymentSpecifications:
+        - minInstances: 6
+          maxRequestConcurrency: 150
+          configuration: "{}"
+          instanceType: instanceType
+          backend: backend
+          availabilityZones:
+          - availabilityZones
+          - availabilityZones
+          maxInstances: 0
+          gpu: gpu
+        - minInstances: 6
+          maxRequestConcurrency: 150
+          configuration: "{}"
+          instanceType: instanceType
+          backend: backend
+          availabilityZones:
+          - availabilityZones
+          - availabilityZones
+          maxInstances: 0
+          gpu: gpu
+      properties:
+        deploymentSpecifications:
+          description: "Deployment specs with Backend, GPU, instance-type, etc. details"
+          items:
+            $ref: '#/components/schemas/GpuSpecificationDto'
+          type: array
+      required:
+      - deploymentSpecifications
+      type: object
+    GpuSpecificationDto:
+      description: Data Transfer Object(DTO) representing GPU specification.
+      example:
+        minInstances: 6
+        maxRequestConcurrency: 150
+        configuration: "{}"
+        instanceType: instanceType
+        backend: backend
+        availabilityZones:
+        - availabilityZones
+        - availabilityZones
+        maxInstances: 0
+        gpu: gpu
+      properties:
+        gpu:
+          description: GPU name from the cluster
+          type: string
+        backend:
+          description: Backend/CSP where the GPU powered instance will be launched
+          type: string
+        maxInstances:
+          description: Maximum number of spot instances for the deployment
+          format: int32
+          type: integer
+        minInstances:
+          description: Minimum number of spot instances for the deployment
+          format: int32
+          type: integer
+        instanceType:
+          description: "Instance type, based on GPU, assigned to a Worker"
+          type: string
+        availabilityZones:
+          description: List of availability-zones(or clusters) in the cluster group
+          items:
+            description: List of availability-zones(or clusters) in the cluster group
+            type: string
+          type: array
+        maxRequestConcurrency:
+          description: Max request concurrency between 1 (default) and 1024.
+          format: int32
+          maximum: 1024
+          minimum: 1
+          type: integer
+        configuration:
+          type: object
+      required:
+      - backend
+      - gpu
+      - maxInstances
+      - minInstances
+      type: object
+    DeploymentHealthDto:
+      description: Data Transfer Object(DTO) representing deployment error
+      example:
+        instanceType: instanceType
+        sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        backend: backend
+        error: error
+        gpu: gpu
+      properties:
+        sisRequestId:
+          description: SIS Request ID
+          format: uuid
+          type: string
+        gpu:
+          description: GPU Type as per SDD
+          type: string
+        backend:
+          description: Backend/CSP where the GPU powered instance will be launched
+          type: string
+        instanceType:
+          description: Instance type
+          type: string
+        error:
+          description: Deployment error
+          type: string
+      required:
+      - backend
+      - error
+      - gpu
+      type: object
+    DeploymentResponse:
+      description: Function Deployment Response
+      example:
+        deployment:
+          functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          requestQueueUrl: requestQueueUrl
+          functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+          functionStatus: ACTIVE
+          healthInfo:
+          - instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            error: error
+            gpu: gpu
+          - instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            error: error
+            gpu: gpu
+          deploymentSpecifications:
+          - minInstances: 6
+            maxRequestConcurrency: 150
+            configuration: "{}"
+            instanceType: instanceType
+            backend: backend
+            availabilityZones:
+            - availabilityZones
+            - availabilityZones
+            maxInstances: 0
+            gpu: gpu
+          - minInstances: 6
+            maxRequestConcurrency: 150
+            configuration: "{}"
+            instanceType: instanceType
+            backend: backend
+            availabilityZones:
+            - availabilityZones
+            - availabilityZones
+            maxInstances: 0
+            gpu: gpu
+      properties:
+        deployment:
+          $ref: '#/components/schemas/FunctionDeploymentDto'
+      required:
+      - deployment
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FunctionDeploymentDto:
+      description: Function deployment response
+      example:
+        functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        requestQueueUrl: requestQueueUrl
+        functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        ncaId: ncaId
+        functionStatus: ACTIVE
+        healthInfo:
+        - instanceType: instanceType
+          sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          backend: backend
+          error: error
+          gpu: gpu
+        - instanceType: instanceType
+          sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          backend: backend
+          error: error
+          gpu: gpu
+        deploymentSpecifications:
+        - minInstances: 6
+          maxRequestConcurrency: 150
+          configuration: "{}"
+          instanceType: instanceType
+          backend: backend
+          availabilityZones:
+          - availabilityZones
+          - availabilityZones
+          maxInstances: 0
+          gpu: gpu
+        - minInstances: 6
+          maxRequestConcurrency: 150
+          configuration: "{}"
+          instanceType: instanceType
+          backend: backend
+          availabilityZones:
+          - availabilityZones
+          - availabilityZones
+          maxInstances: 0
+          gpu: gpu
+      properties:
+        functionId:
+          description: Function id
+          format: uuid
+          type: string
+        functionVersionId:
+          description: Function version id
+          format: uuid
+          type: string
+        ncaId:
+          description: NVIDIA Cloud Account Id
+          type: string
+        functionStatus:
+          description: Function status
+          enum:
+          - ACTIVE
+          - DEPLOYING
+          - ERROR
+          - INACTIVE
+          - DELETED
+          type: string
+        requestQueueUrl:
+          description: SQS Request Queue URL
+          type: string
+        healthInfo:
+          description: 'Health info for a deployment specification is included only
+            if there are any  issues/errors. '
+          items:
+            $ref: '#/components/schemas/DeploymentHealthDto'
+          type: array
+        deploymentSpecifications:
+          description: Function deployment details
+          items:
+            $ref: '#/components/schemas/GpuSpecificationDto'
+          type: array
+      required:
+      - deploymentSpecifications
+      - functionId
+      - functionStatus
+      - functionVersionId
+      - ncaId
+      - requestQueueUrl
+      type: object
+    InvokeFunctionRequest:
+      description: Request body for creating a job/task for inference/train using
+        a GPU powered spot instance in cloud.
+      example:
+        requestBody: "{}"
+        requestHeader:
+          inputAssetReferences:
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          meteringData:
+          - value: value
+            key: key
+          - value: value
+            key: key
+          pollDurationSeconds: 300
+      properties:
+        requestBody:
+          type: object
+        requestHeader:
+          $ref: '#/components/schemas/RequestHeaderDto'
+      required:
+      - requestBody
+      type: object
+    MeteringDataEntryDto:
+      description: Data Transfer Object(DTO) representing a billing/metering data
+        entry
+      example:
+        value: value
+        key: key
+      properties:
+        key:
+          description: Metering/Billing key
+          type: string
+        value:
+          description: Metering/Billing value
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    RequestHeaderDto:
+      description: 'Data Transfer Object(DTO) representing header/address for Cloud
+        Functions processing. '
+      example:
+        inputAssetReferences:
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        meteringData:
+        - value: value
+          key: key
+        - value: value
+          key: key
+        pollDurationSeconds: 300
+      properties:
+        inputAssetReferences:
+          description: List of UUIDs corresponding to the uploaded assets to be used
+            as input for executing the task.
+          items:
+            description: List of UUIDs corresponding to the uploaded assets to be
+              used as input for executing the task.
+            format: uuid
+            type: string
+          type: array
+        meteringData:
+          description: Metadata used for billing/metering purposes.
+          items:
+            $ref: '#/components/schemas/MeteringDataEntryDto'
+          type: array
+        pollDurationSeconds:
+          default: 300
+          description: Polling timeout duration.
+          example: 300
+          format: int32
+          maximum: 300
+          type: integer
+          x-konfig-original-example: 300
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-RequestHeaderDto-properties-pollDurationSeconds
+      type: object
+    InvokeFunctionResponse:
+      description: Response body with result from a request for executing a job/task
+        as a cloud function using a GPU powered spot/on-demand instance.
+      example:
+        response: response
+        responseReference: http://example.com/aeiou
+        errorCode: 6
+        percentComplete: 0
+        reqId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        status: errored
+      properties:
+        reqId:
+          description: Request id
+          format: uuid
+          type: string
+        status:
+          description: Status of the task/job executing cloud function.
+          enum:
+          - errored
+          - in-progress
+          - fulfilled
+          - pending-evaluation
+          - rejected
+          type: string
+        responseReference:
+          description: "For large results, responseReference will be a pre-signeddownload\
+            \ URL."
+          format: url
+          type: string
+        percentComplete:
+          description: Progress indicator for the task/job executing cloud function.
+          format: int32
+          type: integer
+        errorCode:
+          description: Error code from the container while executing cloud function.
+          format: int32
+          type: integer
+        response:
+          description: Response/result of size < 5MB size for the task/job executing
+            cloud function.
+          type: string
+      type: object
+      x-konfig-is-used-in-successful-response: true
+      x-konfig-is-used-in-non-successful-response: true
+    ArtifactDto:
+      description: Data Transfer Object(DTO) representing an artifact
+      example:
+        name: name
+        version: version
+        uri: https://openapi-generator.tech
+      properties:
+        version:
+          description: Artifact version
+          type: string
+        name:
+          description: Artifact name
+          type: string
+        uri:
+          description: Artifact URI
+          format: uri
+          type: string
+      required:
+      - name
+      - uri
+      - version
+      type: object
+    ContainerEnvironmentEntryDto:
+      description: Data Transfer Object(DTO) representing a container environment
+        entry
+      example:
+        value: value
+        key: key
+      properties:
+        key:
+          description: Container environment key
+          type: string
+        value:
+          description: Container environment value
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    CreateFunctionRequest:
+      description: Request payload to create function.
+      example:
+        inferenceUrl: https://openapi-generator.tech
+        models:
+        - name: name
+          version: version
+          uri: https://openapi-generator.tech
+        - name: name
+          version: version
+          uri: https://openapi-generator.tech
+        apiBodyFormat: PREDICT_V2
+        inferencePort: 0
+        containerEnvironment:
+        - value: value
+          key: key
+        - value: value
+          key: key
+        helmChart: https://openapi-generator.tech
+        name: name
+        resources:
+        - name: name
+          version: version
+          uri: https://openapi-generator.tech
+        - name: name
+          version: version
+          uri: https://openapi-generator.tech
+        containerArgs: containerArgs
+        containerImage: https://openapi-generator.tech
+        healthUri: https://openapi-generator.tech
+        helmChartServiceName: helmChartServiceName
+      properties:
+        name:
+          description: "Function name must start with lowercase/uppercase/digit and\
+            \ can only contain lowercase, uppercase, digit, hyphen, and underscore\
+            \ characters"
+          maxLength: 36
+          minLength: 10
+          pattern: "^[a-z0-9A-Z][a-z0-9A-Z\\-_]*$"
+          type: string
+        inferenceUrl:
+          description: Entrypoint for invoking the container to process a request
+          format: uri
+          type: string
+        healthUri:
+          description: Health endpoint for the container or the helmChart
+          format: uri
+          type: string
+        inferencePort:
+          description: 'Optional port number where the inference listener is running.
+            Defaults to 8000  for Triton. '
+          format: int32
+          type: integer
+        containerArgs:
+          description: Args to be passed when launching the container
+          type: string
+        containerEnvironment:
+          description: Environment settings for launching the container
+          items:
+            $ref: '#/components/schemas/ContainerEnvironmentEntryDto'
+          type: array
+        models:
+          description: Optional set of models
+          items:
+            $ref: '#/components/schemas/ArtifactDto'
+          type: array
+          uniqueItems: true
+        containerImage:
+          description: Optional custom container image
+          format: uri
+          type: string
+        helmChart:
+          description: Optional Helm Chart
+          format: uri
+          type: string
+        helmChartServiceName:
+          description: 'Helm Chart Service Name is required when helmChart property
+            is specified '
+          type: string
+        resources:
+          description: Optional set of resources
+          items:
+            $ref: '#/components/schemas/ArtifactDto'
+          type: array
+          uniqueItems: true
+        apiBodyFormat:
+          description: Invocation request body format
+          enum:
+          - PREDICT_V2
+          - CUSTOM
+          type: string
+      required:
+      - inferenceUrl
+      - name
+      type: object
+    CreateFunctionResponse:
+      description: Response body for create function request.
+      example:
+        function:
+          inferenceUrl: https://openapi-generator.tech
+          models:
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          apiBodyFormat: PREDICT_V2
+          helmChart: https://openapi-generator.tech
+          resources:
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          containerArgs: containerArgs
+          healthUri: https://openapi-generator.tech
+          activeInstances:
+          - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceId: instanceId
+            functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            location: location
+            ncaId: ncaId
+            instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+            instanceStatus: ACTIVE
+            gpu: gpu
+            instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+          - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceId: instanceId
+            functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            location: location
+            ncaId: ncaId
+            instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+            instanceStatus: ACTIVE
+            gpu: gpu
+            instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          versionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          inferencePort: 0
+          containerEnvironment:
+          - value: value
+            key: key
+          - value: value
+            key: key
+          ownedByDifferentAccount: true
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+          containerImage: https://openapi-generator.tech
+          helmChartServiceName: helmChartServiceName
+          status: ACTIVE
+      properties:
+        function:
+          $ref: '#/components/schemas/FunctionDto'
+      required:
+      - function
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FunctionDto:
+      description: Data Transfer Object(DTO) representing a function
+      example:
+        inferenceUrl: https://openapi-generator.tech
+        models:
+        - name: name
+          version: version
+          uri: https://openapi-generator.tech
+        - name: name
+          version: version
+          uri: https://openapi-generator.tech
+        apiBodyFormat: PREDICT_V2
+        helmChart: https://openapi-generator.tech
+        resources:
+        - name: name
+          version: version
+          uri: https://openapi-generator.tech
+        - name: name
+          version: version
+          uri: https://openapi-generator.tech
+        containerArgs: containerArgs
+        healthUri: https://openapi-generator.tech
+        activeInstances:
+        - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          instanceId: instanceId
+          functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          instanceType: instanceType
+          sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          backend: backend
+          location: location
+          ncaId: ncaId
+          instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+          instanceStatus: ACTIVE
+          gpu: gpu
+          instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+        - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          instanceId: instanceId
+          functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          instanceType: instanceType
+          sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          backend: backend
+          location: location
+          ncaId: ncaId
+          instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+          instanceStatus: ACTIVE
+          gpu: gpu
+          instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        versionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        inferencePort: 0
+        containerEnvironment:
+        - value: value
+          key: key
+        - value: value
+          key: key
+        ownedByDifferentAccount: true
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        ncaId: ncaId
+        containerImage: https://openapi-generator.tech
+        helmChartServiceName: helmChartServiceName
+        status: ACTIVE
+      properties:
+        id:
+          description: Unique function id
+          format: uuid
+          type: string
+        ncaId:
+          description: NVIDIA Cloud Account Id
+          type: string
+        versionId:
+          description: Unique function version id
+          format: uuid
+          type: string
+        name:
+          description: Function name
+          type: string
+        status:
+          description: Function status
+          enum:
+          - ACTIVE
+          - DEPLOYING
+          - ERROR
+          - INACTIVE
+          - DELETED
+          type: string
+        inferenceUrl:
+          description: Entrypoint for invoking the container to process requests
+          format: uri
+          type: string
+        ownedByDifferentAccount:
+          description: "Indicates whether the function is owned by another account.\
+            \ If the account  that is being used to lookup functions happens to be\
+            \ authorized to invoke/list  this function which is owned by a different\
+            \ account, then this field is set  to true and ncaId will contain the\
+            \ id of the account that owns the function.  Otherwise, this field is\
+            \ not set as it defaults to false. "
+          type: boolean
+        inferencePort:
+          description: Optional port number where the inference listener is running
+            - defaults to 8000 for Triton
+          format: int32
+          type: integer
+        containerArgs:
+          description: Args used to launch the container
+          type: string
+        containerEnvironment:
+          description: Environment settings used to launch the container
+          items:
+            $ref: '#/components/schemas/ContainerEnvironmentEntryDto'
+          type: array
+        models:
+          description: Optional set of models
+          items:
+            $ref: '#/components/schemas/ArtifactDto'
+          type: array
+          uniqueItems: true
+        containerImage:
+          description: Optional custom container
+          format: uri
+          type: string
+        apiBodyFormat:
+          description: Invocation request body format
+          enum:
+          - PREDICT_V2
+          - CUSTOM
+          type: string
+        helmChart:
+          description: Optional Helm Chart
+          format: uri
+          type: string
+        helmChartServiceName:
+          description: 'Helm Chart Service Name specified only when helmChart property
+            is specified '
+          type: string
+        healthUri:
+          description: Health endpoint for the container or helmChart
+          format: uri
+          type: string
+        createdAt:
+          description: Function creation timestamp
+          format: date-time
+          type: string
+        activeInstances:
+          description: List of active instances for this function.
+          items:
+            $ref: '#/components/schemas/InstanceDto'
+          type: array
+        resources:
+          description: Optional set of resources.
+          items:
+            $ref: '#/components/schemas/ArtifactDto'
+          type: array
+          uniqueItems: true
+      required:
+      - createdAt
+      - healthUri
+      - id
+      - name
+      - ncaId
+      - status
+      - versionId
+      type: object
+    InstanceDto:
+      description: Data Transfer Object(DTO) representing a spot instance
+      example:
+        functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        instanceId: instanceId
+        functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        instanceType: instanceType
+        sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        backend: backend
+        location: location
+        ncaId: ncaId
+        instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+        instanceStatus: ACTIVE
+        gpu: gpu
+        instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        instanceId:
+          description: Unique id of the instance
+          type: string
+        functionId:
+          description: Function executing on the instance
+          format: uuid
+          type: string
+        functionVersionId:
+          description: Function version executing on the instance
+          format: uuid
+          type: string
+        instanceType:
+          description: GPU instance-type powering the instance
+          type: string
+        instanceStatus:
+          description: Instance status
+          enum:
+          - ACTIVE
+          - ERRORED
+          - PREEMPTED
+          - DELETED
+          type: string
+        sisRequestId:
+          description: SIS request-id used to launch this instance
+          format: uuid
+          type: string
+        ncaId:
+          description: NVIDIA Cloud Account Id that owns the function running on the
+            instance
+          type: string
+        gpu:
+          description: GPU name powering the instance
+          type: string
+        backend:
+          description: Backend where the instance is running
+          type: string
+        location:
+          description: Location such as zone name or region where the instance is
+            running
+          type: string
+        instanceCreatedAt:
+          description: Instance creation timestamp
+          format: date-time
+          type: string
+        instanceUpdatedAt:
+          description: Instance's last updated timestamp
+          format: date-time
+          type: string
+      type: object
+    AuthorizedPartiesRequest:
+      description: Request to associated authorized parties for a specific version
+        or allversions of a function
+      example:
+        authorizedParties:
+        - clientId: clientId
+          ncaId: ncaId
+        - clientId: clientId
+          ncaId: ncaId
+      properties:
+        authorizedParties:
+          description: Parties authorized to invoke function
+          items:
+            $ref: '#/components/schemas/AuthorizedPartyDto'
+          type: array
+      required:
+      - authorizedParties
+      type: object
+    AuthorizedPartyDto:
+      description: Data Transfer Object(DTO) representing an authorized party.
+      example:
+        clientId: clientId
+        ncaId: ncaId
+      properties:
+        clientId:
+          description: Client Id -- 'sub' claim in the JWT. This field should not
+            be  specified anymore.
+          type: string
+        ncaId:
+          description: NVIDIA Cloud Account authorized to invoke the function
+          type: string
+      required:
+      - ncaId
+      type: object
+    AuthorizedPartiesByFunctionDto:
+      description: Data Transfer Object(DTO) representing a function with authorized
+        accounts
+      example:
+        versionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        authorizedParties:
+        - clientId: clientId
+          ncaId: ncaId
+        - clientId: clientId
+          ncaId: ncaId
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        ncaId: ncaId
+      properties:
+        id:
+          description: Function id
+          format: uuid
+          type: string
+        ncaId:
+          description: NVIDIA Cloud Account Id
+          type: string
+        versionId:
+          description: Function version id
+          format: uuid
+          type: string
+        authorizedParties:
+          description: Authorized parties allowed to invoke the function
+          items:
+            $ref: '#/components/schemas/AuthorizedPartyDto'
+          type: array
+      required:
+      - id
+      - ncaId
+      type: object
+    AuthorizedPartiesResponse:
+      description: Parties authorized to invoke function
+      example:
+        function:
+          versionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          authorizedParties:
+          - clientId: clientId
+            ncaId: ncaId
+          - clientId: clientId
+            ncaId: ncaId
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+      properties:
+        function:
+          $ref: '#/components/schemas/AuthorizedPartiesByFunctionDto'
+      required:
+      - function
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    CreateAssetRequest:
+      description: Request payload to create an asset-id and the corresponding pre-signed
+        URL to upload an asset of specified content-type to AWS S3 bucket.
+      example:
+        description: description
+        contentType: contentType
+      properties:
+        description:
+          description: Asset description
+          type: string
+        contentType:
+          description: "Content type of the asset such image/png, image/jpeg, etc."
+          type: string
+      required:
+      - contentType
+      - description
+      type: object
+    CreateAssetResponse:
+      description: Response body containing asset-id and the corresponding pre-signed
+        URL to upload an asset of specified content-type to AWS S3 bucket.
+      example:
+        uploadUrl: http://example.com/aeiou
+        assetId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        description: description
+        contentType: contentType
+      properties:
+        description:
+          description: Asset description to be used when uploading the asset
+          type: string
+        assetId:
+          description: Unique id of the asset to be uploaded to AWS S3 bucket
+          format: uuid
+          type: string
+        uploadUrl:
+          description: Pre-signed upload URL to upload asset
+          format: url
+          type: string
+        contentType:
+          description: "Content type of the asset such image/png, image/jpeg, etc."
+          type: string
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    PatchAuthorizedPartyRequest:
+      description: 'Request payload to associate/disassociate authorized party with
+        function '
+      example:
+        authorizedParty:
+          clientId: clientId
+          ncaId: ncaId
+      properties:
+        authorizedParty:
+          $ref: '#/components/schemas/AuthorizedPartyDto'
+      required:
+      - authorizedParty
+      type: object
+    GetQueuesResponse:
+      description: Request queue details of all the functions with same id in an account
+      example:
+        functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        queues:
+        - functionName: functionName
+          functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          queueDepth: 0
+          functionStatus: ACTIVE
+        - functionName: functionName
+          functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          queueDepth: 0
+          functionStatus: ACTIVE
+      properties:
+        functionId:
+          description: Function id
+          format: uuid
+          type: string
+        queues:
+          description: Details of all the queues associated with same named functions
+          items:
+            $ref: '#/components/schemas/QueueDto'
+          type: array
+      required:
+      - functionId
+      - queues
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    QueueDto:
+      description: Data Transfer Object(DTO) representing a request queue for function
+        version
+      example:
+        functionName: functionName
+        functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        queueDepth: 0
+        functionStatus: ACTIVE
+      properties:
+        functionVersionId:
+          description: Function version id
+          format: uuid
+          type: string
+        functionName:
+          description: Function name
+          type: string
+        functionStatus:
+          description: Function status
+          enum:
+          - ACTIVE
+          - DEPLOYING
+          - ERROR
+          - INACTIVE
+          - DELETED
+          type: string
+        queueDepth:
+          description: Approximate number of messages in the request queue
+          format: int32
+          type: integer
+      required:
+      - functionName
+      - functionStatus
+      - functionVersionId
+      type: object
+    GetPositionInQueueResponse:
+      description: Request position in queue for invocation request
+      example:
+        functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        positionInQueue: 0
+        functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        functionVersionId:
+          description: Function version id
+          format: uuid
+          type: string
+        functionId:
+          description: Function id
+          format: uuid
+          type: string
+        positionInQueue:
+          description: Position of request in queue
+          format: int32
+          type: integer
+      required:
+      - functionId
+      - functionVersionId
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FunctionResponse:
+      description: Response body with function details
+      example:
+        function:
+          inferenceUrl: https://openapi-generator.tech
+          models:
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          apiBodyFormat: PREDICT_V2
+          helmChart: https://openapi-generator.tech
+          resources:
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          containerArgs: containerArgs
+          healthUri: https://openapi-generator.tech
+          activeInstances:
+          - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceId: instanceId
+            functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            location: location
+            ncaId: ncaId
+            instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+            instanceStatus: ACTIVE
+            gpu: gpu
+            instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+          - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceId: instanceId
+            functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            location: location
+            ncaId: ncaId
+            instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+            instanceStatus: ACTIVE
+            gpu: gpu
+            instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          versionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          inferencePort: 0
+          containerEnvironment:
+          - value: value
+            key: key
+          - value: value
+            key: key
+          ownedByDifferentAccount: true
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+          containerImage: https://openapi-generator.tech
+          helmChartServiceName: helmChartServiceName
+          status: ACTIVE
+      properties:
+        function:
+          $ref: '#/components/schemas/FunctionDto'
+      required:
+      - function
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    ListFunctionsResponse:
+      description: Response body containing list of functions
+      example:
+        functions:
+        - inferenceUrl: https://openapi-generator.tech
+          models:
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          apiBodyFormat: PREDICT_V2
+          helmChart: https://openapi-generator.tech
+          resources:
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          containerArgs: containerArgs
+          healthUri: https://openapi-generator.tech
+          activeInstances:
+          - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceId: instanceId
+            functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            location: location
+            ncaId: ncaId
+            instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+            instanceStatus: ACTIVE
+            gpu: gpu
+            instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+          - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceId: instanceId
+            functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            location: location
+            ncaId: ncaId
+            instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+            instanceStatus: ACTIVE
+            gpu: gpu
+            instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          versionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          inferencePort: 0
+          containerEnvironment:
+          - value: value
+            key: key
+          - value: value
+            key: key
+          ownedByDifferentAccount: true
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+          containerImage: https://openapi-generator.tech
+          helmChartServiceName: helmChartServiceName
+          status: ACTIVE
+        - inferenceUrl: https://openapi-generator.tech
+          models:
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          apiBodyFormat: PREDICT_V2
+          helmChart: https://openapi-generator.tech
+          resources:
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          - name: name
+            version: version
+            uri: https://openapi-generator.tech
+          containerArgs: containerArgs
+          healthUri: https://openapi-generator.tech
+          activeInstances:
+          - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceId: instanceId
+            functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            location: location
+            ncaId: ncaId
+            instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+            instanceStatus: ACTIVE
+            gpu: gpu
+            instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+          - functionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceId: instanceId
+            functionVersionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            instanceType: instanceType
+            sisRequestId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            backend: backend
+            location: location
+            ncaId: ncaId
+            instanceUpdatedAt: 2000-01-23T04:56:07.000+00:00
+            instanceStatus: ACTIVE
+            gpu: gpu
+            instanceCreatedAt: 2000-01-23T04:56:07.000+00:00
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          versionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          inferencePort: 0
+          containerEnvironment:
+          - value: value
+            key: key
+          - value: value
+            key: key
+          ownedByDifferentAccount: true
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+          containerImage: https://openapi-generator.tech
+          helmChartServiceName: helmChartServiceName
+          status: ACTIVE
+      properties:
+        functions:
+          description: List of functions
+          items:
+            $ref: '#/components/schemas/FunctionDto'
+          type: array
+      required:
+      - functions
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    ListFunctionIdsResponse:
+      description: Response body containing list of function ids in an account
+      example:
+        functionIds:
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        functionIds:
+          description: List of function ids
+          items:
+            description: List of function ids
+            format: uuid
+            type: string
+          type: array
+      required:
+      - functionIds
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    Cluster:
+      example:
+        name: name
+        id: id
+        k8sVersion: k8sVersion
+      properties:
+        k8sVersion:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+      type: object
+    ClusterGroup:
+      example:
+        authorizedNcaIds:
+        - authorizedNcaIds
+        - authorizedNcaIds
+        gpus:
+        - instanceTypes:
+          - default: true
+            name: name
+            description: description
+          - default: true
+            name: name
+            description: description
+          name: name
+        - instanceTypes:
+          - default: true
+            name: name
+            description: description
+          - default: true
+            name: name
+            description: description
+          name: name
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        ncaId: ncaId
+        clusters:
+        - name: name
+          id: id
+          k8sVersion: k8sVersion
+        - name: name
+          id: id
+          k8sVersion: k8sVersion
+      properties:
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        ncaId:
+          type: string
+        authorizedNcaIds:
+          items:
+            type: string
+          type: array
+        gpus:
+          items:
+            $ref: '#/components/schemas/Gpu'
+          type: array
+        clusters:
+          items:
+            $ref: '#/components/schemas/Cluster'
+          type: array
+      type: object
+    ClusterGroupsResponse:
+      example:
+        clusterGroups:
+        - authorizedNcaIds:
+          - authorizedNcaIds
+          - authorizedNcaIds
+          gpus:
+          - instanceTypes:
+            - default: true
+              name: name
+              description: description
+            - default: true
+              name: name
+              description: description
+            name: name
+          - instanceTypes:
+            - default: true
+              name: name
+              description: description
+            - default: true
+              name: name
+              description: description
+            name: name
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+          clusters:
+          - name: name
+            id: id
+            k8sVersion: k8sVersion
+          - name: name
+            id: id
+            k8sVersion: k8sVersion
+        - authorizedNcaIds:
+          - authorizedNcaIds
+          - authorizedNcaIds
+          gpus:
+          - instanceTypes:
+            - default: true
+              name: name
+              description: description
+            - default: true
+              name: name
+              description: description
+            name: name
+          - instanceTypes:
+            - default: true
+              name: name
+              description: description
+            - default: true
+              name: name
+              description: description
+            name: name
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+          clusters:
+          - name: name
+            id: id
+            k8sVersion: k8sVersion
+          - name: name
+            id: id
+            k8sVersion: k8sVersion
+      properties:
+        clusterGroups:
+          items:
+            $ref: '#/components/schemas/ClusterGroup'
+          type: array
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    Gpu:
+      example:
+        instanceTypes:
+        - default: true
+          name: name
+          description: description
+        - default: true
+          name: name
+          description: description
+        name: name
+      properties:
+        name:
+          type: string
+        instanceTypes:
+          items:
+            $ref: '#/components/schemas/InstanceType'
+          type: array
+      type: object
+    InstanceType:
+      example:
+        default: true
+        name: name
+        description: description
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+        default:
+          type: boolean
+      type: object
+    ListAuthorizedPartiesResponse:
+      description: Parties authorized to invoke function
+      example:
+        functions:
+        - versionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          authorizedParties:
+          - clientId: clientId
+            ncaId: ncaId
+          - clientId: clientId
+            ncaId: ncaId
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+        - versionId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          authorizedParties:
+          - clientId: clientId
+            ncaId: ncaId
+          - clientId: clientId
+            ncaId: ncaId
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          ncaId: ncaId
+      properties:
+        functions:
+          description: Functions with authorized parties and other details
+          items:
+            $ref: '#/components/schemas/AuthorizedPartiesByFunctionDto'
+          type: array
+      required:
+      - functions
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    AssetDto:
+      description: Data Transfer Object(DTO) representing an asset
+      example:
+        assetId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        description: description
+        contentType: contentType
+      properties:
+        description:
+          description: Description specified when creating the asset
+          type: string
+        assetId:
+          description: Asset id
+          format: uuid
+          type: string
+        contentType:
+          description: Content-type specified when creating the asset
+          type: string
+      type: object
+    AssetResponse:
+      example:
+        asset:
+          assetId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          description: description
+          contentType: contentType
+      properties:
+        asset:
+          $ref: '#/components/schemas/AssetDto'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    ListAssetsResponse:
+      description: Response body containing list of assets of the current nca id
+      example:
+        assets:
+        - assetId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          description: description
+          contentType: contentType
+        - assetId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          description: description
+          contentType: contentType
+      properties:
+        assets:
+          description: List of assets uploaded for the nca id
+          items:
+            $ref: '#/components/schemas/AssetDto'
+          type: array
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    HealthComponent:
+      example:
+        description: description
+        status: status
+      properties:
+        description:
+          type: string
+        status:
+          type: string
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FunctionInvocationInvokeFunctionRequest:
+      type: object
+    FunctionInvocationInvokeFunctionRequest1:
+      type: object
+    FunctionInvocationInvokeFunctionResponse:
+      items:
+        $ref: '#/components/schemas/FunctionInvocationInvokeFunctionResponse_inner'
+      type: array
+      x-konfig-is-used-in-successful-response: true
+    FunctionInvocationInvokeFunction200Response:
+      example:
+        double: 5.637376656633329
+        char: char
+        direct: true
+        short: 0
+        readOnly: true
+        float: 5.962134
+        int: 6
+        long: 1
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FunctionInvocationInvokeFunction202Response:
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FunctionInvocationInvokeFunction302Response:
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    FunctionInvocationInvokeFunction402Response:
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    FunctionInvocationInvokeFunction403Response:
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    FunctionInvocationInvokeFunction200Response1:
+      items:
+        $ref: '#/components/schemas/FunctionInvocationInvokeFunctionResponse_inner'
+      type: array
+      x-konfig-is-used-in-successful-response: true
+    FunctionInvocationPollForResultUsingFunctionInvocationRequestResponse:
+      example:
+        double: 5.637376656633329
+        char: char
+        direct: true
+        short: 0
+        readOnly: true
+        float: 5.962134
+        int: 6
+        long: 1
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FunctionInvocationPollForResultUsingFunctionInvocationRequest202Response:
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    FunctionInvocationPollForResultUsingFunctionInvocationRequest302Response:
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    FunctionInvocationPollForResultUsingFunctionInvocationRequest402Response:
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    FunctionInvocationPollForResultUsingFunctionInvocationRequest403Response:
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+      x-konfig-is-used-in-non-successful-response: true
+      x-do-not-generate: true
+    konfig-generated-schema-paths--v2-nvcf-deployments-functions-functionId-versions-functionVersionId-delete-parameters-2-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--v2-nvcf-functions-get-parameters-0-schema:
+      example:
+      - authorized
+      - private
+      - public
+      items:
+        example: authorized
+        type: string
+      type: array
+      x-do-not-generate: true
+    konfig-generated-schema-paths--v2-nvcf-functions-ids-get-parameters-0-schema:
+      example:
+      - authorized
+      - private
+      - public
+      items:
+        example: authorized
+        type: string
+      type: array
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-RequestHeaderDto-properties-pollDurationSeconds:
+      example: 300
+      type: number
+      x-do-not-generate: true
+    konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-deployments-functions-functionId-versions-functionVersionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+        graceful:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--v2-nvcf-deployments-functions-functionId-versions-functionVersionId-delete-parameters-2-schema
+      required:
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+      - graceful
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-deployments-functions-functionId-versions-functionVersionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-deployments-functions-functionId-versions-functionVersionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+        deploymentSpecifications:
+          description: "Deployment specs with Backend, GPU, instance-type, etc. details"
+          items:
+            $ref: '#/components/schemas/GpuSpecificationDto'
+          type: array
+      required:
+      - deploymentSpecifications
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    konfig-generated-schema-single-parameter-schema-put--v2-nvcf-deployments-functions-functionId-versions-functionVersionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+        deploymentSpecifications:
+          description: "Deployment specs with Backend, GPU, instance-type, etc. details"
+          items:
+            $ref: '#/components/schemas/GpuSpecificationDto'
+          type: array
+      required:
+      - deploymentSpecifications
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-pexec-functions-functionId:
+      properties:
+        NVCF-INPUT-ASSET-REFERENCES:
+          items:
+            type: string
+          type: array
+        functionId:
+          format: uuid
+          type: string
+        NVCF-POLL-SECONDS:
+          format: int32
+          maximum: 300
+          type: integer
+      required:
+      - functionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - NVCF-INPUT-ASSET-REFERENCES
+      - functionId
+      - NVCF-POLL-SECONDS
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-pexec-functions-functionId-versions-versionId:
+      properties:
+        NVCF-INPUT-ASSET-REFERENCES:
+          items:
+            type: string
+          type: array
+        functionId:
+          format: uuid
+          type: string
+        versionId:
+          format: uuid
+          type: string
+        NVCF-POLL-SECONDS:
+          format: int32
+          maximum: 300
+          type: integer
+      required:
+      - functionId
+      - versionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - NVCF-INPUT-ASSET-REFERENCES
+      - functionId
+      - versionId
+      - NVCF-POLL-SECONDS
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-exec-functions-functionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        requestBody:
+          type: object
+        requestHeader:
+          $ref: '#/components/schemas/RequestHeaderDto'
+      required:
+      - functionId
+      - requestBody
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-exec-functions-functionId-versions-versionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        versionId:
+          format: uuid
+          type: string
+        requestBody:
+          type: object
+        requestHeader:
+          $ref: '#/components/schemas/RequestHeaderDto'
+      required:
+      - functionId
+      - requestBody
+      - versionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - versionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-functions-functionId-versions:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-functions-functionId-versions:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        name:
+          description: "Function name must start with lowercase/uppercase/digit and\
+            \ can only contain lowercase, uppercase, digit, hyphen, and underscore\
+            \ characters"
+          maxLength: 36
+          minLength: 10
+          pattern: "^[a-z0-9A-Z][a-z0-9A-Z\\-_]*$"
+          type: string
+        inferenceUrl:
+          description: Entrypoint for invoking the container to process a request
+          format: uri
+          type: string
+        healthUri:
+          description: Health endpoint for the container or the helmChart
+          format: uri
+          type: string
+        inferencePort:
+          description: 'Optional port number where the inference listener is running.
+            Defaults to 8000  for Triton. '
+          format: int32
+          type: integer
+        containerArgs:
+          description: Args to be passed when launching the container
+          type: string
+        containerEnvironment:
+          description: Environment settings for launching the container
+          items:
+            $ref: '#/components/schemas/ContainerEnvironmentEntryDto'
+          type: array
+        models:
+          description: Optional set of models
+          items:
+            $ref: '#/components/schemas/ArtifactDto'
+          type: array
+          uniqueItems: true
+        containerImage:
+          description: Optional custom container image
+          format: uri
+          type: string
+        helmChart:
+          description: Optional Helm Chart
+          format: uri
+          type: string
+        helmChartServiceName:
+          description: 'Helm Chart Service Name is required when helmChart property
+            is specified '
+          type: string
+        resources:
+          description: Optional set of resources
+          items:
+            $ref: '#/components/schemas/ArtifactDto'
+          type: array
+          uniqueItems: true
+        apiBodyFormat:
+          description: Invocation request body format
+          enum:
+          - PREDICT_V2
+          - CUSTOM
+          type: string
+      required:
+      - functionId
+      - inferenceUrl
+      - name
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-functions:
+      properties:
+        visibility:
+          default:
+          - authorized
+          - private
+          - public
+          example:
+          - authorized
+          - private
+          - public
+          items:
+            enum:
+            - authorized
+            - private
+            - public
+            type: string
+          type: array
+          uniqueItems: true
+          x-konfig-original-example:
+          - authorized
+          - private
+          - public
+          x-konfig-generated-schema: konfig-generated-schema-paths--v2-nvcf-functions-get-parameters-0-schema
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - visibility
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-functions:
+      properties:
+        name:
+          description: "Function name must start with lowercase/uppercase/digit and\
+            \ can only contain lowercase, uppercase, digit, hyphen, and underscore\
+            \ characters"
+          maxLength: 36
+          minLength: 10
+          pattern: "^[a-z0-9A-Z][a-z0-9A-Z\\-_]*$"
+          type: string
+        inferenceUrl:
+          description: Entrypoint for invoking the container to process a request
+          format: uri
+          type: string
+        healthUri:
+          description: Health endpoint for the container or the helmChart
+          format: uri
+          type: string
+        inferencePort:
+          description: 'Optional port number where the inference listener is running.
+            Defaults to 8000  for Triton. '
+          format: int32
+          type: integer
+        containerArgs:
+          description: Args to be passed when launching the container
+          type: string
+        containerEnvironment:
+          description: Environment settings for launching the container
+          items:
+            $ref: '#/components/schemas/ContainerEnvironmentEntryDto'
+          type: array
+        models:
+          description: Optional set of models
+          items:
+            $ref: '#/components/schemas/ArtifactDto'
+          type: array
+          uniqueItems: true
+        containerImage:
+          description: Optional custom container image
+          format: uri
+          type: string
+        helmChart:
+          description: Optional Helm Chart
+          format: uri
+          type: string
+        helmChartServiceName:
+          description: 'Helm Chart Service Name is required when helmChart property
+            is specified '
+          type: string
+        resources:
+          description: Optional set of resources
+          items:
+            $ref: '#/components/schemas/ArtifactDto'
+          type: array
+          uniqueItems: true
+        apiBodyFormat:
+          description: Invocation request body format
+          enum:
+          - PREDICT_V2
+          - CUSTOM
+          type: string
+      required:
+      - inferenceUrl
+      - name
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+        authorizedParties:
+          description: Parties authorized to invoke function
+          items:
+            $ref: '#/components/schemas/AuthorizedPartyDto'
+          type: array
+      required:
+      - authorizedParties
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-authorizations-functions-functionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-authorizations-functions-functionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-authorizations-functions-functionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        authorizedParties:
+          description: Parties authorized to invoke function
+          items:
+            $ref: '#/components/schemas/AuthorizedPartyDto'
+          type: array
+      required:
+      - authorizedParties
+      - functionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-assets:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--v2-nvcf-assets:
+      properties:
+        description:
+          description: Asset description
+          type: string
+        contentType:
+          description: "Content type of the asset such image/png, image/jpeg, etc."
+          type: string
+      required:
+      - contentType
+      - description
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    ? konfig-generated-schema-single-parameter-schema-patch--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId-remove
+    : properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+        authorizedParty:
+          $ref: '#/components/schemas/AuthorizedPartyDto'
+      required:
+      - authorizedParty
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    ? konfig-generated-schema-single-parameter-schema-patch--v2-nvcf-authorizations-functions-functionId-versions-functionVersionId-add
+    : properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+        authorizedParty:
+          $ref: '#/components/schemas/AuthorizedPartyDto'
+      required:
+      - authorizedParty
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    konfig-generated-schema-single-parameter-schema-patch--v2-nvcf-authorizations-functions-functionId-remove:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        authorizedParty:
+          $ref: '#/components/schemas/AuthorizedPartyDto'
+      required:
+      - authorizedParty
+      - functionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+    konfig-generated-schema-single-parameter-schema-patch--v2-nvcf-authorizations-functions-functionId-add:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        authorizedParty:
+          $ref: '#/components/schemas/AuthorizedPartyDto'
+      required:
+      - authorizedParty
+      - functionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-queues-functions-functionId-versions-versionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        versionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      - versionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - versionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-queues-functions-functionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-queues-requestId-position:
+      properties:
+        requestId:
+          format: uuid
+          type: string
+      required:
+      - requestId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - requestId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-pexec-status-requestId:
+      properties:
+        requestId:
+          format: uuid
+          type: string
+        NVCF-POLL-SECONDS:
+          format: int32
+          maximum: 300
+          type: integer
+      required:
+      - requestId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - requestId
+      - NVCF-POLL-SECONDS
+    konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-functions-functionId-versions-functionVersionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-functions-functionId-versions-functionVersionId:
+      properties:
+        functionId:
+          format: uuid
+          type: string
+        functionVersionId:
+          format: uuid
+          type: string
+      required:
+      - functionId
+      - functionVersionId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - functionId
+      - functionVersionId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-functions-ids:
+      properties:
+        visibility:
+          default:
+          - authorized
+          - private
+          - public
+          example:
+          - authorized
+          - private
+          - public
+          items:
+            enum:
+            - authorized
+            - private
+            - public
+            type: string
+          type: array
+          uniqueItems: true
+          x-konfig-original-example:
+          - authorized
+          - private
+          - public
+          x-konfig-generated-schema: konfig-generated-schema-paths--v2-nvcf-functions-ids-get-parameters-0-schema
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - visibility
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-exec-status-requestId:
+      properties:
+        requestId:
+          format: uuid
+          type: string
+      required:
+      - requestId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - requestId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-clusterGroups:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-delete--v2-nvcf-assets-assetId:
+      properties:
+        assetId:
+          format: uuid
+          type: string
+      required:
+      - assetId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - assetId
+    konfig-generated-schema-single-parameter-schema-get--v2-nvcf-assets-assetId:
+      properties:
+        assetId:
+          format: uuid
+          type: string
+      required:
+      - assetId
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - assetId
+    konfig-generated-schema-single-parameter-schema-get--health-**:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    FunctionInvocationInvokeFunctionResponse_inner:
+      properties:
+        short:
+          format: int32
+          type: integer
+        char:
+          type: string
+        int:
+          format: int32
+          type: integer
+        long:
+          format: int64
+          type: integer
+        float:
+          format: float
+          type: number
+        double:
+          format: double
+          type: number
+        direct:
+          type: boolean
+        readOnly:
+          type: boolean
+      type: object
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true
+  samples-enabled: true
+
